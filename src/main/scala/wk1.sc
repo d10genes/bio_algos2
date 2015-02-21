@@ -1,6 +1,7 @@
 //import wk1._
 import wk1.wk1._
 //import com.beard.bio2_scala.utils.wk1o._
+//import org.scalacheck._
 
 val t = Tr('a')
 val e: Trie[Char] = Empty
@@ -18,26 +19,6 @@ val lst = "ATAGA"
 val ll = lst.toList
 val ss = lst.toSet
 
-e.addNode(t)
-t.addNode(t.addNode(t))
-
-def addString(t: Trie[Char], s: String): Trie[Char] = s match {
-  case "" => t
-//  case _ =>
-}
-
-//def insertList[A](t: Trie[A], xs: List[A]): Trie[A] = xs match {
-//  case Nil => t
-//  case y::ys => t.children.span(_.content != Some(y)) match {
-//    case (neqs, Nil) => new Trie(t.content, neqs:::(insertList(Tr(y), ys)::Nil))
-//    case (neqs, eq::rst) => new Trie(t.content, neqs:::(insertList(eq, ys)::rst))
-//  }
-//}
-
-val ns = ll.map(Tr)
-ss.head
-
-ns.span(_.content != Some('T'))
 val n1 = e.insertList(ll)
 val n2 = n1.insertList(ll)
 val n3 = n1.insertList("ATC".toList)
@@ -47,18 +28,27 @@ val n3 = n1.insertList("ATC".toList)
 n3.map(print)
 
 
+//val lines = scala.io.Source.fromFile("src/data/w1tst.txt").mkString
 
 val tr = insertStrs(List("ATAGA", "ATC", "GAT"))
-fmtAdjLst(adjLst(tr))
+//fmtAdjLst(adjLst(tr))
+def search[A](t: Trie[A], txt: List[A]): Boolean = (txt, t.children, t.content) match {
+  case (Nil, Nil, _) => true
+  case (Nil, _, _) => false
+  case (_, Nil, _) => true
+  case (_, _, Some(x)) => if (x == txt.head)
+    t.children.exists(search(_, txt.tail))
+    else false
+  case (_, _, None) => t.children.exists(search(_, txt))
+}
 
-//adjLst(n3.insertList("GAT".toList)).map()
-//def fmtLst()
-//0->1:A
-//1->2:T
-//2->3:A
-//3->4:G
-//4->5:A
-//2->6:C
-//0->7:G
-//7->8:A
-//8->9:T
+val subs = removeSubs(List(List(A, A, G), List(A, A, G, C), List(A, G, C), List(A, A, G, C)))
+val sss = List(A, A, G).containsSlice(List())
+val tx = List(A, A, G, G, G, G, C, G, C, A, T, T, A, C, C)
+val pts = List(List(C, A, G, T, T, A), List(A, A, G, G, G, G, C, G, C, A))
+dumbCheck(tx, pts)
+//Gen.
+//val xx = (lst, "ATrGAG").zipped.forall(_ == _)
+//val sch = search(n3, List('A', 'T', 'C'))
+//val sch2 = search(n3, "ATAGA".toList)
+
