@@ -8,7 +8,7 @@ import wk1.wk1._
  * Created by williambeard on 2/18/15.
  */
 
-object wk1$Test extends Properties("String") {
+object wk1$Test extends Properties("Trie") {
   val e = Empty: Trie[Char]
   property("insertList") = forAll { (a: String) =>
     val lst = a.toList
@@ -30,25 +30,35 @@ object wk1$Test extends Properties("String") {
     } yield (text, removeSubs(subs))
   }
 
-  property("searchList") = forAll(genPatSet()) { (tup: (List[DNA], List[List[DNA]])) =>
-    //    val lst = a.toList
-    println("==>\n")
+  def countFound[A](text: List[A], pats: List[List[A]], fn: (List[A], List[List[A]]) => Boolean): Int = {
+    text.tails.map((x: List[A]) => fn(x, pats)).count(bid)
+  }
+  property("dumbCheck") = forAll(genPatSet()) { (tup: (List[DNA], List[List[DNA]])) =>
+//    println("==>\n")
     val (text, subs) = tup
-    val nfound = text.tails.map((x: List[DNA]) => dumbCheck(x, subs)).count((x: Boolean) => x)
-    println(s"nfound: $nfound len: ${subs.length}")
-    if (nfound < subs.length) println(s"text: $text\nsubs: $subs")
-    else print()
-    nfound >= subs.length
-//        text.tails.forall(!dumbCheck(_, subs))
-      }
+    val nfound = text.tails.map((x: List[DNA]) => dumbCheck(x, subs)).count(bid)
+//    println(s"nfound: $nfound len: ${subs.length}")
+//    if (nfound < subs.length) println(s"text: $text\nsubs: $subs")
+//    else print()
+    nfound >= subs.length // can be greater if dupe sequences in text
+  }
 
-//  property("insertList") = forAll { (a: String, as: List[String]) =>
-////    val lst = a.toList
-//    val nukes = "ATCG".toList
-//    val ass = a::as
-//    val tr = insertStrs(as)
-////    val tr = insertStrs(List("ATAGA", "ATC", "GAT"))
-////    e.insertList(lst) == e.insertList(lst).insertList(lst)
-//  }
+  property("search vs dumbCheck") = forAll(genPatSet()) { (tup: (List[DNA], List[List[DNA]])) =>
+    //    println("==>\n")
+    val (text, subs) = tup
+//    val nfound = text.tails.map((x: List[DNA]) => dumbCheck(x, subs)).count(bid)
+    val nfound = countFound(text, subs, dumbCheck)
+    val nfound2 = countFound(text, subs, trieCheck)
 
+    //    println(s"nfound: $nfound len: ${subs.length}")
+    //    if (nfound < subs.length) println(s"text: $text\nsubs: $subs")
+    //    else print()
+//    nfound >= subs.length // can be greater if dupe sequences in text
+    if (nfound != nfound2) {println(s"nfound: $nfound\nnfound2: $nfound2")
+      println(s"text: $text\nsubs: $subs")
+    } else ()
+
+//    println(s"nfound: $nfound\nnfound2: $nfound2")
+    nfound == nfound2
+  }
 }
