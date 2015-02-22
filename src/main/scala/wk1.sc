@@ -29,23 +29,25 @@ n3.map(print)
 
 
 //val lines = scala.io.Source.fromFile("src/data/w1tst.txt").mkString
+val pats = List("ATCG", "GGGT").map(_.toList)
 
-val tr = insertStrs(List("ATAGA", "ATC", "GAT"))
+val tr = fromLists(pats)
+search(tr, "AATCGGGTTCAATCGGGGT".toList)
+val fnd = tr.check("GA".toList)
 //fmtAdjLst(adjLst(tr))
-def search[A](t: Trie[A], txt: List[A]): Boolean = (txt, t.children, t.content) match {
-  case (Nil, Nil, _) => true
-  case (Nil, _, _) => false
-  case (_, Nil, _) => true
-  case (_, _, Some(x)) => if (x == txt.head)
-    t.children.exists(search(_, txt.tail))
-    else false
-  case (_, _, None) => t.children.exists(search(_, txt))
-}
-
+val dc = dumbCheck("GA".toList, pats)
 val subs = removeSubs(List(List(A, A, G), List(A, A, G, C), List(A, G, C), List(A, A, G, C)))
 val sss = List(A, A, G).containsSlice(List())
-val tx = List(A, A, G, G, G, G, C, G, C, A, T, T, A, C, C)
+val tx = List(T, A, A, G, G, G, G, C, G, C, A, T, T, A, C, C)
+//val pts = List(List(C, A))  // , List(A, A, G, G, G, G, C, G, C, A)
 val pts = List(List(C, A, G, T, T, A), List(A, A, G, G, G, G, C, G, C, A))
+
+def search[A](tr: Trie[A], txt: List[A]) = {
+  txt.tails.zipWithIndex.filter((tup) => tr.check(tup._1)).map(_._2).toList
+}
+val xx = search(fromLists(pts), tx)
+//tx.tails.zipWithIndex.map()
+val sh = fromLists(pts).showTrie()
 dumbCheck(tx, pts)
 //Gen.
 //val xx = (lst, "ATrGAG").zipped.forall(_ == _)
